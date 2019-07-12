@@ -44,8 +44,8 @@ export default {
       checked: true,
       // 表单对应的对象
       loginForm: {
-        mobile: '',
-        code: ''
+        mobile: '18648465210',
+        code: '246810'
       },
       // 表单的校验规则对象
       loginRules: {
@@ -74,8 +74,10 @@ export default {
           this.$ajax.post('http://ttapi.research.itcast.cn/mp/v1_0/authorizations', this.loginForm)
             .then((res) => {
               // res是响应对象,res.data是响应回来的数据
+              // 登录成功后保存登录后返回的用户信息,包含token
+              // 使用sessionStorage储存token,关闭浏览器会失效
+              window.sessionStorage.setItem('hmtt', JSON.stringify(res.data.data))
               // 登陆成功后跳转到首页
-              console.log(res.data)
               this.$router.push('/')
             })
         }
