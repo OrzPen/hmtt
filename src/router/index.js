@@ -24,4 +24,26 @@ const router = new VueRouter({
     { path: '*', name: '404', component: NotFound }
   ]
 })
+// 登录后,在本地储存的用户信息
+// 如果储存了用户信息,证明登陆过,如果没有储存,表示没有登录,跳转回login登录
+// 使用路由导航,每一次跳转,去校验登录的状态,没登录跳转/login,登陆了next()放行
+router.beforeEach((to, form, next) => {
+  // 原始写法
+  // 如果是登录页面,放行
+  // if (to.path === '/login') return next()
+  // // 判断登录状态
+  // const user = window.sessionStorage.getItem('hmtt')
+  // // 如果user存在,放行
+  // if (user) {
+  //   next()
+  // } else {
+  //   // 否则跳转回登录页
+  //   next('/login')
+  // }
+
+  // 优化写法
+  const user = window.sessionStorage.getItem('hmtt')
+  if (to.path !== '/login' && !user) return next('/login')
+  next()
+})
 export default router
