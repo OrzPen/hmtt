@@ -5,6 +5,7 @@ import Login from '../views/login/index.vue'
 import Home from '../views/home'
 import WelCome from '../views/wecome'
 import NotFound from '../views/404/404.vue'
+import Article from '../views/article'
 Vue.use(VueRouter)
 const router = new VueRouter({
   routes: [
@@ -14,7 +15,8 @@ const router = new VueRouter({
       path: '/',
       component: Home,
       children: [
-        { path: '/', name: 'welcome', component: WelCome }
+        { path: '/', name: 'welcome', component: WelCome },
+        { path: '/article', name: 'article', component: Article }
       ]
     },
     // 请求一个路径,如果没有对应的规则,此时认为是404请求
