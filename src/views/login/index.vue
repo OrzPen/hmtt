@@ -68,18 +68,29 @@ export default {
     // 整体表单的校验
     login () {
       // 因为组件上的函数需要通过dom才能调用 ,所以在这获取el-form的dom对象 ,使用校验函数的名称 validate 回调函数 传参 valid  判断整个表单是否校验成功
-      this.$refs.loginForm.validate((valid) => {
-        if (valid) {
-          // 如果校验成功,进行登录
-          this.$ajax.post('http://ttapi.research.itcast.cn/mp/v1_0/authorizations', this.loginForm)
-            .then((res) => {
-              // res是响应对象,res.data是响应回来的数据
-              // 登录成功后保存登录后返回的用户信息,包含token
-              // 使用sessionStorage储存token,关闭浏览器会失效
-              window.sessionStorage.setItem('hmtt', JSON.stringify(res.data.data))
-              // 登陆成功后跳转到首页
-              this.$router.push('/')
-            })
+      // this.$refs.loginForm.validate((valid) => {
+      //   if (valid) {
+      //     // 如果校验成功,进行登录
+      //     this.$ajax.post('http://ttapi.research.itcast.cn/mp/v1_0/authorizations', this.loginForm)
+      //       .then((res) => {
+      //         // res是响应对象,res.data是响应回来的数据
+      //         // 登录成功后保存登录后返回的用户信息,包含token
+      //         // 使用sessionStorage储存token,关闭浏览器会失效
+      //         window.sessionStorage.setItem('hmtt', JSON.stringify(res.data.data))
+      //         // 登陆成功后跳转到首页
+      //         this.$router.push('/')
+      //       })
+      //   }
+      // })
+      this.$refs.loginForm.validate(async (valid) => {
+        // try{ 业务逻辑 }catch(err) {当业务逻辑失败报错就会调用catch,进行错误后的处理}
+        try {
+          const res = await this.$ajax.post('authorizations', this.loginForm)
+          window.sessionStorage.setItem('hmtt', JSON.stringify(res.data.data))
+          this.$router.push('/')
+        } catch (err) {
+          // 错误调用
+          this.$message.error('用户名或密码错误')
         }
       })
     }

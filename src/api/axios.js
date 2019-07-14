@@ -25,5 +25,17 @@ instance.interceptors.request.use(config => {
   // Promise.reject() 创建一个失败的promise
   return Promise.reject(error)
 })
+// 响应拦截器
+instance.interceptors.response.use(response => {
+  return response
+}, (error) => {
+  // 如果响应状态码是 401 拦截到登录页面
+  // error.response.status 状态码
+  if (error.response.status === 401) {
+    // hash 是location提供获取操作 地址栏的#后的地址的属性
+    location.hash = '#/login'
+  }
+  return Promise.reject(error)
+})
 
 export default instance
