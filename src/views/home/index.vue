@@ -14,7 +14,7 @@
           再给el-menu加上router属性
        -->
       <el-menu
-        default-active="$route.path"
+        :default-active="$route.path"
         background-color="#002033"
         text-color="#fff"
         active-text-color="#ffd04b"
