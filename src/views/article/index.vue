@@ -42,11 +42,11 @@
 </template>
 
 <script>
-import MyBread from '@/components/my-bread.vue'
+// import MyBread from '@/components/my-bread.vue'
 export default {
-  components: {
-    MyBread
-  },
+//   components: {
+//     MyBread
+//   },
   data () {
     return {
       // 提交给后台的筛选条件  传参
