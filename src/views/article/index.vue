@@ -46,7 +46,7 @@
     <el-card class="box">
     <div slot="header">
         根据筛选条件共查询到
-        <b>0</b> 条结果：
+        <b>{{total}}</b> 条结果：
     </div>
     <el-table :data="articles">
         <el-table-column label="封面">
@@ -77,7 +77,19 @@
         </el-table-column>
       </el-table>
     <div class="box">
-        <el-pagination background layout="prev, pager, next" :total="1000">
+      <!--
+        @current-change  页码切换时触发的事件
+        current-page   当前页
+        page-size  一页显示多少条
+        total  总条数
+       -->
+        <el-pagination
+        background
+        layout="prev, pager, next"
+        @current-change="changePager"
+        :current-page="reqParams.page"
+        :page-size="reqParams.per_page"
+        :total="total">
         </el-pagination>
     </div>
 </el-card>
@@ -110,7 +122,8 @@ export default {
       // 日期控件的数据
       dateValues: [],
       // 文章列表
-      articles: []
+      articles: [],
+      total: 0
     }
   },
   methods: {
@@ -124,6 +137,7 @@ export default {
     async getArticles () {
       const { data: { data } } = await this.$ajax.get('articles', { params: this.reqParams })
       this.articles = data.results
+      this.total = data.total_count
     },
     changeDate (values) {
       this.reqParams.begin_pubdate = values[0]
@@ -131,6 +145,13 @@ export default {
     },
     search () {
       console.log(this.reqParams)
+      this.getArticles()
+    },
+    changePager (newPage) {
+      // newpage 当前点击的按钮的页码
+      // 更新提交个服务器的参数
+      this.reqParams.page = newPage
+      // 重新获取列表数据
       this.getArticles()
     }
   }
