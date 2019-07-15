@@ -47,6 +47,9 @@ export default {
 //   components: {
 //     MyBread
 //   },
+  created () {
+    this.getChannelOptions()
+  },
   data () {
     return {
       // 提交给后台的筛选条件  传参
@@ -58,9 +61,17 @@ export default {
         end_pubdate: null
       },
       // 默认频道数据
-      channelOptions: [{ name: 'Java', id: 1 }],
+      channelOptions: [],
       // 日期控件的数据
       dateValues: []
+    }
+  },
+  methods: {
+    // 定义获取下拉列表的方法,发送ajax请求数据,将请求回来的数据保存到定义好的空数据中
+    async getChannelOptions () {
+      const { data: { data } } = await
+      this.$ajax.get('channels')
+      this.channelOptions = data.channels
     }
   }
 }
