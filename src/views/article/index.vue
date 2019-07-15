@@ -1,4 +1,5 @@
 <template>
+<div>
     <!-- 筛选容器 -->
     <el-card>
       <div slot="header">
@@ -39,6 +40,26 @@
         </el-form-item>
       </el-form>
     </el-card>
+    <!-- 查询结果容器 -->
+    <el-card class="box">
+    <div slot="header">
+        根据筛选条件共查询到
+        <b>0</b> 条结果：
+    </div>
+    <el-table :data="articles">
+        <el-table-column label="封面"></el-table-column>
+        <el-table-column label="标题"></el-table-column>
+        <el-table-column label="状态"></el-table-column>
+        <el-table-column label="发布时间"></el-table-column>
+        <el-table-column label="操作"></el-table-column>
+    </el-table>
+    <div class="box">
+        <el-pagination background layout="prev, pager, next" :total="1000">
+        </el-pagination>
+    </div>
+</el-card>
+</div>
+
 </template>
 
 <script>
@@ -77,6 +98,9 @@ export default {
 }
 </script>
 
-<style>
-
+<style scoped lang='less'>
+  .box{
+    margin-top: 20px;
+    text-align: center;
+  }
 </style>
