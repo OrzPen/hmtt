@@ -21,7 +21,7 @@
           <!-- 添加v-if判断,如果是收藏栏移除图片下方操作按钮 -->
           <div class="fot" v-if="!reqParams.collect">
             <span @click="toggleFav(item)" class="el-icon-star-off" :class="{red:item.is_collected}"></span>
-            <span class="el-icon-delete"></span>
+            <span class="el-icon-delete" @click="delImage(item.id)"></span>
           </div>
         </li>
       </ul>
@@ -116,6 +116,19 @@ export default {
       // 成功操作, 图标切换颜色
       this.$message.success('操作成功')
       item.is_collected = data.collect
+    },
+    // 删除素材功能
+    delImage (id) {
+      this.$confirm('此操作将永久删除该图片, 是否继续?', '温馨提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(async () => {
+        await this.$ajax.delete('user/images/' + id)
+        // 删除成功
+        this.$message.success('删除成功')
+        this.getImages()
+      }).catch(() => {})
     }
   }
 }
