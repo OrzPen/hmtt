@@ -17,14 +17,7 @@
           </el-radio-group>
         </el-form-item>
         <el-form-item label="频道：">
-          <el-select v-model="reqParams.channel_id">
-            <el-option
-              v-for="item in channelOptions"
-              :key="item.id"
-              :label="item.name"
-              :value="item.id"
-            ></el-option>
-          </el-select>
+         <my-channel v-model="reqParams.channel_id"></my-channel>
         </el-form-item>
         <el-form-item label="时间：">
           <el-date-picker
@@ -70,9 +63,9 @@
         </el-table-column>
         <el-table-column label="发布时间" prop="pubdate"></el-table-column>
         <el-table-column label="操作" width="120px">
-          <template >
+          <template slot-scope="scope">
             <el-button icon="el-icon-edit" plain circle type="primary"></el-button>
-            <el-button icon="el-icon-delete" plain circle type="danger"></el-button>
+            <el-button icon="el-icon-delete" plain circle type="danger" @click="del(scope.row.id)"></el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -104,7 +97,6 @@ export default {
 //     MyBread
 //   },
   created () {
-    this.getChannelOptions()
     this.getArticles()
   },
   data () {
@@ -127,12 +119,6 @@ export default {
     }
   },
   methods: {
-    // 定义获取下拉列表的方法,发送ajax请求数据,将请求回来的数据保存到定义好的空数据中
-    async getChannelOptions () {
-      const { data: { data } } = await
-      this.$ajax.get('channels')
-      this.channelOptions = data.channels
-    },
     // 获取后台内容数据
     async getArticles () {
       const { data: { data } } = await this.$ajax.get('articles', { params: this.reqParams })
@@ -144,7 +130,7 @@ export default {
       this.reqParams.end_pubdate = values[1]
     },
     search () {
-      console.log(this.reqParams)
+      // console.log(this.reqParams)
       this.getArticles()
     },
     changePager (newPage) {
@@ -153,6 +139,25 @@ export default {
       this.reqParams.page = newPage
       // 重新获取列表数据
       this.getArticles()
+    },
+    del (id) {
+      // 确认框
+      this.$confirm('亲，此操作将永久删除该文章, 是否继续?', '温馨提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(async () => {
+          // 点击确认  发删除请求
+          // 后台没有任何响应  一直等待响应 导致后面代码无法执行。
+          await this.$ajax.delete(`articles/${id}`)
+          // 删除成功后做什么？
+          this.getArticles()
+          this.$message.success('删除成功')
+        })
+        .catch(() => {
+          // 点击取消
+        })
     }
   }
 }

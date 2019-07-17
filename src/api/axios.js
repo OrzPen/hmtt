@@ -1,13 +1,16 @@
 // 封装axios
 import axios from 'axios'
+import JSONBig from 'json-bigint'
 const instance = axios.create({
   // 设置axios基准路径,默认加载路径前的路径
-  baseURL: 'http://ttapi.research.itcast.cn/mp/v1_0/'
-  // // 设置请求头
-  // headers: {
-  //   // token认证需要的字段,值前面注意加上前缀bearer+空格
-  //   Authorization: 'Bearer ' + JSON.parse(window.sessionStorage.getItem('hmtt')).token
-  // }
+  baseURL: 'http://ttapi.research.itcast.cn/mp/v1_0/',
+  // axios默认有转换方式JSON.parse(),但是会有js最大值的限制,所以在这里修改默认的转换方式
+  transformResponse: [(data) => {
+    if (data) {
+      return JSONBig.parse(data)
+    }
+    return data
+  }]
 })
 instance.interceptors.request.use(config => {
   // config 请求配置对象
@@ -31,7 +34,7 @@ instance.interceptors.response.use(response => {
 }, (error) => {
   // 如果响应状态码是 401 拦截到登录页面
   // error.response.status 状态码
-  if (error.response.status === 401) {
+  if (error.response && error.response.status === 401) {
     // hash 是location提供获取操作 地址栏的#后的地址的属性
     location.hash = '#/login'
   }
