@@ -20,7 +20,7 @@
           <img :src="item.url" alt />
           <!-- 添加v-if判断,如果是收藏栏移除图片下方操作按钮 -->
           <div class="fot" v-if="!reqParams.collect">
-            <span class="el-icon-star-off" :class="{red:item.is_collected}"></span>
+            <span @click="toggleFav(item)" class="el-icon-star-off" :class="{red:item.is_collected}"></span>
             <span class="el-icon-delete"></span>
           </div>
         </li>
@@ -109,6 +109,13 @@ export default {
         this.getImages()
         this.imageUrl = null
       }, 2000)
+    },
+    // 收藏取消收藏功能
+    async toggleFav (item) {
+      const { data: { data } } = await this.$ajax.put('user/images/' + item.id, { collect: !item.is_collected })
+      // 成功操作, 图标切换颜色
+      this.$message.success('操作成功')
+      item.is_collected = data.collect
     }
   }
 }
