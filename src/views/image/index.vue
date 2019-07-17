@@ -12,7 +12,7 @@
           <el-radio-button :label="true">收藏</el-radio-button>
         </el-radio-group>
         <!-- 添加素材 -->
-        <el-button size="small" style="float:right" type="success" >添加素材</el-button>
+        <el-button size="small" style="float:right" type="success" @click="dialogVisible = true">添加素材</el-button>
       </div>
       <ul class="img-list">
         <!-- 循环遍历后台返回的images数组 并绑定图片唯一的id值-->
@@ -36,6 +36,23 @@
       :total="total"
       ></el-pagination>
     </el-card>
+    <!-- 添加素材对话框 -->
+    <el-dialog title="添加素材" :visible.sync="dialogVisible" width="300px">
+      <el-upload
+        class="avatar-uploader"
+        action="http://ttapi.research.itcast.cn/mp/v1_0/user/images"
+        :show-file-list="false"
+        :headers="headers"
+        name="image"
+        :on-success="handleSuccess"
+      >
+        <img v-if="imageUrl" :src="imageUrl" class="avatar" />
+        <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+      </el-upload>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="dialogVisible = false">取 消</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -53,7 +70,13 @@ export default {
       images: [],
       total: 0,
       // 控制添加素材对话框的显示与隐藏,默认隐藏false
-      dialogVisible: false
+      dialogVisible: false,
+      // 预览图片的地址
+      imageUrl: null,
+      // 上传时携带的请求头
+      headers: {
+        Authorization: 'Bearer ' + JSON.parse(window.sessionStorage.getItem('hmtt')).token
+      }
     }
   },
   created () {
@@ -73,6 +96,19 @@ export default {
       // 页码发生改变时,把新页码保存到数据中重新渲染列表
       this.reqParams.page = newPage
       this.getImages()
+    },
+    // 上传成功后触发的回调函数
+    handleSuccess (res) {
+      // 预览的地址放到data中
+      this.imageUrl = res.data.url
+      // 上传成功后的提示信息
+      this.$message.success('上传成功')
+      // 设置定时自动关闭对话框,并更新列表数据,把预览图片清空
+      window.setTimeout(() => {
+        this.dialogVisible = false
+        this.getImages()
+        this.imageUrl = null
+      }, 2000)
     }
   }
 }

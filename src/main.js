@@ -5,6 +5,8 @@ import 'element-ui/lib/theme-chalk/index.css'
 import router from './router/index'
 import axios from './api/axios'
 import components from './components/index.js'
+// 引入全局样式
+import './style/index.less'
 Vue.use(components)
 
 Vue.use(ElementUI)
