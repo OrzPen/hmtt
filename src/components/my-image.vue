@@ -39,10 +39,15 @@
                 <el-tab-pane label="上传图片" name="upload">
                     <!-- action后面是向后台提交的地址 -->
                     <!-- show-file-list是上传文件后的文件信息 -->
+                    <!-- headers是发送请求时携带的请求头,此处携带token -->
+                    <!-- on-success是发送成功后触发的回调函数,此处把后端返回的地址赋值给data中的数据 -->
                     <el-upload
                     class="avatar-uploader"
-                    action="https://jsonplaceholder.typicode.com/posts/"
+                    action="http://ttapi.research.itcast.cn/mp/v1_0/user/images"
+                    name="image"
+                    :headers="headers"
                     :show-file-list="false"
+                    :on-success="handleSuccess"
                     >
                         <!-- 如果有图片信息,显示图片 -->
                         <img v-if="imageUrl" :src="imageUrl" class="avatar" />
@@ -83,12 +88,19 @@ export default {
       // 素材总数
       total: 0,
       // 当前选中的图片地址
-      selectedImageUrl: null
+      selectedImageUrl: null,
+      // 请求头数据
+      headers: {
+        Authorization:
+          'Bearer ' +
+          JSON.parse(window.sessionStorage.getItem('hmtt')).token
+      }
     }
   },
   methods: {
     // 在点击图片按钮时获取素材数据
     clickimage () {
+      this.imageUrl = null
       this.dialogVisible = true
       this.getImage()
     },
@@ -105,6 +117,7 @@ export default {
     },
     // 单选框改变时触发的事件,此时重新发送请求渲染列表
     toggleImage () {
+      // 优化切换全部和收藏后样式还在的问题
       this.selectedImageUrl = null
       this.reqParams.page = 1
       this.getImage()
@@ -112,6 +125,10 @@ export default {
     // 获取当前点击图片的URL
     selected (url) {
       this.selectedImageUrl = url
+    },
+    handleSuccess (res) {
+    // 上传成功后把后台返回的url地址添加到data中的数据中
+      this.imageUrl = res.data.url
     }
   }
 }
