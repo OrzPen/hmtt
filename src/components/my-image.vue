@@ -3,7 +3,7 @@
         <!-- 图片按钮 -->
         <!-- 设置dialogVisible控制点击显示隐藏对话框 -->
         <div class="img-btn" @click="clickimage()">
-            <img src="../assets/images/default.png" alt />
+            <img :src="value" alt />
         </div>
         <!-- 对话框 -->
         <el-dialog :visible.sync="dialogVisible" width="700px">
@@ -60,13 +60,16 @@
             <span slot="footer" class="dialog-footer">
                 <!-- 点击取消隐藏对话框 -->
                 <el-button @click="dialogVisible = false">取 消</el-button>
-                <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+                <!-- 点击确定绑定确认事件 -->
+                <el-button type="primary" @click="confirmImage()">确 定</el-button>
             </span>
          </el-dialog>
     </div>
 </template>
 
 <script>
+// webpack无法打包值是地址的数据,所以在此导入地址,此时图片格式为base64
+import defaultImage from '../assets/images/default.png'
 export default {
   name: 'my-image',
   data () {
@@ -94,12 +97,15 @@ export default {
         Authorization:
           'Bearer ' +
           JSON.parse(window.sessionStorage.getItem('hmtt')).token
-      }
+      },
+      // 默认显示图片
+      value: defaultImage
     }
   },
   methods: {
     // 在点击图片按钮时获取素材数据
     clickimage () {
+      this.activeName = 'image'
       this.imageUrl = null
       this.dialogVisible = true
       this.getImage()
@@ -129,6 +135,24 @@ export default {
     handleSuccess (res) {
     // 上传成功后把后台返回的url地址添加到data中的数据中
       this.imageUrl = res.data.url
+    },
+    // 点击确定后需要做的事情
+    confirmImage () {
+      // 根据选中的tab判断是哪个地方点击的确定
+      // 如果是image,说明是素材库区域点的确定
+      if (this.activeName === 'image') {
+        // 严谨判断,如果没有选中图片结束函数并弹出提示信息
+        if (!this.selectedImageUrl) return this.$message.info('请选中封面图')
+        // 如果成功,把默认图替换为素材库的图片地址
+        this.value = this.selectedImageUrl
+      } else {
+        // 严谨判断,如果上传图片中没有图片地址结束函数并弹出提示信息
+        if (!this.imageUrl) return this.$message.info('请上传封面图')
+        // 如果成功,把默认显示图替换为上传的图片地址
+        this.value = this.imageUrl
+      }
+      this.selectedImageUrl = null
+      this.dialogVisible = false
     }
   }
 }
