@@ -2,7 +2,7 @@
     <div class="image-container">
         <!-- 图片按钮 -->
         <!-- 设置dialogVisible控制点击显示隐藏对话框 -->
-        <div class="img-btn" @click="getImage()">
+        <div class="img-btn" @click="clickimage()">
             <img src="../assets/images/default.png" alt />
         </div>
         <!-- 对话框 -->
@@ -12,17 +12,28 @@
                 <el-tab-pane label="素材库" name="image">
                     <!-- 单选框组 -->
                     <div style="margin-bottom:10px">
-                        <el-radio-group size="small" v-model="reqParams.collect">
+                        <!-- 切换时绑定change事件,重新渲染列表 -->
+                        <el-radio-group size="small" @change="toggleImage" v-model="reqParams.collect">
                         <el-radio-button :label="false">全部</el-radio-button>
                         <el-radio-button :label="true">收藏</el-radio-button>
                         </el-radio-group>
                     </div>
                     <!-- 图片列表 -->
-                    <div class="img-item" v-for="item in images" :key="item.id">
+                    <!-- 素材选中功能 在此处标签添加selected事件获取此时点击的图片的url -->
+                    <!-- 根据当前图片的id和遍历时的ID匹配,如果一直加上选中时的样式,不一致不加 -->
+                    <div class="img-item" :class="{selected:selectedImageUrl===item.url}" @click="selected(item.url)" v-for="item in images" :key="item.id">
                         <img :src="item.url" alt />
                     </div>
                     <!-- 分页区域 -->
-                    <el-pagination background layout="prev, pager, next" :total="1000"></el-pagination>
+                    <el-pagination
+                    v-if="total>reqParams.per_page"
+                    background
+                    layout="prev, pager, next"
+                    :page-size="reqParams.per_page"
+                    :current-page="reqParams.page"
+                    @current-change="pager"
+                    :total="total"
+                    ></el-pagination>
                 </el-tab-pane>
                 <!-- 上传图片 -->
                 <el-tab-pane label="上传图片" name="upload">
@@ -68,15 +79,39 @@ export default {
       // 上传图片预览地址
       imageUrl: null,
       // 定义空素材列表
-      images: []
+      images: [],
+      // 素材总数
+      total: 0,
+      // 当前选中的图片地址
+      selectedImageUrl: null
     }
   },
   methods: {
-    // 获取素材数据
-    async getImage () {
+    // 在点击图片按钮时获取素材数据
+    clickimage () {
       this.dialogVisible = true
+      this.getImage()
+    },
+    async getImage () {
       const { data: { data } } = await this.$ajax.get('/user/images', { params: this.reqParams })
       this.images = data.results
+      // 赋值total
+      this.total = data.total_count
+    },
+    // 切换页的时候触发的事件
+    pager (newPage) {
+      this.reqParams.page = newPage
+      this.getImage()
+    },
+    // 单选框改变时触发的事件,此时重新发送请求渲染列表
+    toggleImage () {
+      this.selectedImageUrl = null
+      this.reqParams.page = 1
+      this.getImage()
+    },
+    // 获取当前点击图片的URL
+    selected (url) {
+      this.selectedImageUrl = url
     }
   }
 }
@@ -90,6 +125,20 @@ export default {
   border: 1px dashed #ddd;
   display: inline-block;
   margin-right: 10px;
+  position: relative;
+  // &连接符  .img-item.selected  .img-item::before{}
+  &.selected{
+    &::before{
+      // 一个和图片一样大小的容器  有半透明背景 打钩图标
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.2) url(../assets/images/selected.png) no-repeat center / 60px 60px
+    }
+  }
   img {
     width: 100%;
     height: 100%;
