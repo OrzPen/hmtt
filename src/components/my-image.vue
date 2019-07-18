@@ -2,7 +2,7 @@
     <div class="image-container">
         <!-- 图片按钮 -->
         <!-- 设置dialogVisible控制点击显示隐藏对话框 -->
-        <div class="img-btn" @click="dialogVisible=true">
+        <div class="img-btn" @click="getImage()">
             <img src="../assets/images/default.png" alt />
         </div>
         <!-- 对话框 -->
@@ -18,8 +18,8 @@
                         </el-radio-group>
                     </div>
                     <!-- 图片列表 -->
-                    <div class="img-item" v-for="item in 8" :key="item">
-                        <img src="../assets/images/avatar.jpg" alt />
+                    <div class="img-item" v-for="item in images" :key="item.id">
+                        <img :src="item.url" alt />
                     </div>
                     <!-- 分页区域 -->
                     <el-pagination background layout="prev, pager, next" :total="1000"></el-pagination>
@@ -66,7 +66,17 @@ export default {
         per_page: 8
       },
       // 上传图片预览地址
-      imageUrl: null
+      imageUrl: null,
+      // 定义空素材列表
+      images: []
+    }
+  },
+  methods: {
+    // 获取素材数据
+    async getImage () {
+      this.dialogVisible = true
+      const { data: { data } } = await this.$ajax.get('/user/images', { params: this.reqParams })
+      this.images = data.results
     }
   }
 }
