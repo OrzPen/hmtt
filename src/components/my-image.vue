@@ -3,7 +3,8 @@
         <!-- 图片按钮 -->
         <!-- 设置dialogVisible控制点击显示隐藏对话框 -->
         <div class="img-btn" @click="clickimage()">
-            <img :src="value" alt />
+            <!-- 判断如果value有值使用value中的地址,如果没有使用默认地址 -->
+            <img :src="value||defaultImage" alt />
         </div>
         <!-- 对话框 -->
         <el-dialog :visible.sync="dialogVisible" width="700px">
@@ -72,8 +73,10 @@
 import defaultImage from '../assets/images/default.png'
 export default {
   name: 'my-image',
+  props: ['value'],
   data () {
     return {
+      defaultImage,
       // 控制对话框显示隐藏
       dialogVisible: false,
       // 控制选项卡选中哪一项
@@ -97,9 +100,7 @@ export default {
         Authorization:
           'Bearer ' +
           JSON.parse(window.sessionStorage.getItem('hmtt')).token
-      },
-      // 默认显示图片
-      value: defaultImage
+      }
     }
   },
   methods: {
@@ -144,12 +145,15 @@ export default {
         // 严谨判断,如果没有选中图片结束函数并弹出提示信息
         if (!this.selectedImageUrl) return this.$message.info('请选中封面图')
         // 如果成功,把默认图替换为素材库的图片地址
-        this.value = this.selectedImageUrl
+        // this.value = this.selectedImageUrl
+        // 通知父组件数据改变数据
+        this.$emit('input', this.selectedImageUrl)
       } else {
         // 严谨判断,如果上传图片中没有图片地址结束函数并弹出提示信息
         if (!this.imageUrl) return this.$message.info('请上传封面图')
         // 如果成功,把默认显示图替换为上传的图片地址
-        this.value = this.imageUrl
+        // this.value = this.imageUrl
+        this.$emit('input', this.imageUrl)
       }
       this.selectedImageUrl = null
       this.dialogVisible = false

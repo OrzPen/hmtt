@@ -20,7 +20,8 @@
             <el-radio :label="-1">自动</el-radio>
           </el-radio-group>
          <!-- 封面组件 -->
-         <my-image></my-image>
+         <!-- 绑定v-model语法糖 -->
+         <my-image v-model="articleForm.cover.images[0]"></my-image>
         </el-form-item>
         <el-form-item label="频道：">
           <my-channel v-model="articleForm.channel_id"></my-channel>
