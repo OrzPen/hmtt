@@ -34,8 +34,8 @@
           <my-channel v-model="articleForm.channel_id"></my-channel>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary">发表</el-button>
-          <el-button>存入草稿</el-button>
+          <el-button type="primary" @click="publish(false)">发表</el-button>
+          <el-button @click="publish(true)">存入草稿</el-button>
         </el-form-item>
       </el-form>
     </el-card>
@@ -83,6 +83,16 @@ export default {
     changeType () {
       // 切换单图三图时,置空数据
       this.articleForm.cover.images = []
+    },
+    async publish (draft) {
+      // ...省略校验
+      // draft  发布 false  草稿 true
+      // 将来数据要地址栏？后传参的方式
+      // this.$http({data:请全体,params:query数据地址栏数据})
+      console.log(this.articleForm)
+      await this.$ajax.post('articles?draft=' + draft, this.articleForm)
+      this.$message.success(draft ? '存入草稿成功' : '发表成功')
+      this.$router.push('/article')
     }
   }
 }
