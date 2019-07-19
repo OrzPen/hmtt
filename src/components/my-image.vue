@@ -163,6 +163,13 @@ export default {
 </script>
 
 <style scoped lang="less">
+.image-container {
+  width: 150px;
+  height: 120px;
+  margin-right: 20px;
+  display: inline-block;
+  margin-bottom: 20px;
+}
 // 对话框样式
 .img-item {
   width: 150px;
