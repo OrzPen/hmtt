@@ -64,7 +64,7 @@
         <el-table-column label="发布时间" prop="pubdate"></el-table-column>
         <el-table-column label="操作" width="120px">
           <template slot-scope="scope">
-            <el-button icon="el-icon-edit" plain circle type="primary"></el-button>
+            <el-button icon="el-icon-edit" plain circle type="primary" @click="edit(scope.row.id)"></el-button>
             <el-button icon="el-icon-delete" plain circle type="danger" @click="del(scope.row.id)"></el-button>
           </template>
         </el-table-column>
@@ -158,6 +158,9 @@ export default {
         .catch(() => {
           // 点击取消
         })
+    },
+    edit (id) {
+      this.$router.push({ path: '/publish', query: { id } })
     }
   }
 }

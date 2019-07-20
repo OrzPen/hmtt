@@ -2,7 +2,7 @@
     <div>
         <el-card>
       <div slot="header">
-        <my-bread>发布文章</my-bread>
+        <my-bread>{{articleId?"修改文章":"发布文章"}}</my-bread>
       </div>
       <el-form :model="articleForm" label-width="100px">
         <el-form-item label="标题：">
@@ -33,9 +33,13 @@
         <el-form-item label="频道：">
           <my-channel v-model="articleForm.channel_id"></my-channel>
         </el-form-item>
-        <el-form-item>
+       <el-form-item v-if="!articleId">
           <el-button type="primary" @click="publish(false)">发表</el-button>
           <el-button @click="publish(true)">存入草稿</el-button>
+        </el-form-item>
+        <el-form-item v-else>
+          <el-button type="success" @click="edit(false)">修改</el-button>
+          <el-button @click="edit(true)">存入草稿</el-button>
         </el-form-item>
       </el-form>
     </el-card>
@@ -51,6 +55,7 @@ export default {
   components: { quillEditor },
   data () {
     return {
+      articleId: null,
       articleForm: {
         // 富文本编辑器中的内容
         content: null,
@@ -79,7 +84,33 @@ export default {
       }
     }
   },
+  created () {
+    // 问题：修改的地址过来 点击发布文章  组件不更新
+    // 什么时候执行 组件的初始化之后调用
+    this.articleId = this.$route.query.id
+    // 获取文章数据
+    this.articleId && this.getArticle(this.articleId)
+  },
+  watch: {
+    $route () {
+      this.articleId = this.$route.query.id
+      this.articleForm = {
+        title: '',
+        content: '',
+        cover: {
+          type: 1,
+          // 单图  三图
+          images: []
+        },
+        channel_id: null
+      }
+    }
+  },
   methods: {
+    async getArticle (id) {
+      const { data: { data } } = await this.$ajax.get('articles/' + id)
+      this.articleForm = data
+    },
     changeType () {
       // 切换单图三图时,置空数据
       this.articleForm.cover.images = []
@@ -92,6 +123,11 @@ export default {
       console.log(this.articleForm)
       await this.$ajax.post('articles?draft=' + draft, this.articleForm)
       this.$message.success(draft ? '存入草稿成功' : '发表成功')
+      this.$router.push('/article')
+    },
+    async edit (draft) {
+      await this.$ajax.put(`articles/${this.articleId}?draft=${draft}`, this.articleForm)
+      this.$message.success(draft ? '修改草稿成功' : '修改成功')
       this.$router.push('/article')
     }
   }
