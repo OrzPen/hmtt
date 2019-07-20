@@ -104,6 +104,9 @@ export default {
     eventBus.$on('updataHeaderName', (name) => {
       this.name = name
     })
+    eventBus.$on('updateHeaderPhoto', (avatar) => {
+      this.avatar = avatar
+    })
   },
   methods: {
     toggleMenu () {

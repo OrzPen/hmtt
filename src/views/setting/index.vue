@@ -28,8 +28,9 @@
           <!-- 上传头像 -->
           <el-upload
             class="avatar-uploader"
-            action="https://jsonplaceholder.typicode.com/posts/"
+            action="http://ttapi.research.itcast.cn/mp/v1_0/user/photo"
             :show-file-list="false"
+            :http-request="upload"
           >
             <img v-if="userForm.photo" :src="userForm.photo" class="avatar" />
             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
@@ -80,6 +81,22 @@ export default {
       const localUser = JSON.parse(window.sessionStorage.getItem('hmtt'))
       localUser.name = data.name
       window.sessionStorage.setItem('hmtt', JSON.stringify(localUser))
+    },
+    upload (data) {
+      // console.log(data.file) 选择的图片
+      // 把文件数据  放在 formData 中
+      const formData = new FormData()
+      formData.append('photo', data.file)
+      this.$ajax.patch('user/photo', formData).then(res => {
+        // 更新设置的头像
+        this.userForm.photo = res.data.data.photo
+        // 更新头部
+        eventBus.$emit('updateHeaderPhoto', res.data.data.photo)
+        // 更新本地存储
+        const localUser = JSON.parse(window.sessionStorage.getItem('hmtt'))
+        localUser.photo = res.data.data.photo
+        window.sessionStorage.setItem('hmtt', JSON.stringify(localUser))
+      })
     }
   }
 }
