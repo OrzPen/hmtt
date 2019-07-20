@@ -20,7 +20,7 @@
               <el-input type="textarea" v-model="userForm.intro" :rows="3"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary">保存设置</el-button>
+              <el-button type="primary" @click="updataUser()">保存设置</el-button>
             </el-form-item>
           </el-form>
         </el-col>
@@ -42,7 +42,9 @@
 </template>
 
 <script>
+import eventBus from '../../eventBus/index'
 export default {
+
   data () {
     return {
       userForm: {
@@ -52,8 +54,7 @@ export default {
         photo: null,
         email: null,
         mobile: null
-      },
-      imageUrl: null
+      }
     }
   },
   created () {
@@ -64,6 +65,21 @@ export default {
     async getUser () {
       const { data: { data } } = await this.$ajax.get('user/profile')
       this.userForm = data
+    },
+    async updataUser () {
+      const { data: { data } } = await this.$ajax.patch('user/profile', {
+        name: this.userForm.name,
+        intro: this.userForm.intro,
+        email: this.userForm.email
+      })
+      this.$message.success('修改用户信息成功')
+      // 让头部用户名称和修改的用户名称同步
+      // 非父子传值,通过eventBus
+      eventBus.$emit('updataHeaderName', data.name)
+      // 保存sessionStorage的信息
+      const localUser = JSON.parse(window.sessionStorage.getItem('hmtt'))
+      localUser.name = data.name
+      window.sessionStorage.setItem('hmtt', JSON.stringify(localUser))
     }
   }
 }
