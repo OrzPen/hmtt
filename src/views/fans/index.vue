@@ -7,11 +7,11 @@
       <el-tabs v-model="activeName" type="card">
         <el-tab-pane label="粉丝列表" name="list">
           <ul class="img-list">
-            <li v-for="item in 10" :key="item">
+            <li v-for="item in fans" :key="item.id">
               <div class="fansImg">
-                <img src="../../assets/images/avatar.jpg" alt />
+                <img :src="item.photo" alt />
               </div>
-              <div class="fansName">13011111111</div>
+              <div class="fansName">{{item.name}}</div>
               <el-button type="primary" plain size="small" class="fansBtn">+ 关注</el-button>
             </li>
           </ul>
@@ -26,7 +26,18 @@
 export default {
   data () {
     return {
-      activeName: 'charts'
+      activeName: 'list',
+      fans: []
+    }
+  },
+  created () {
+    this.getFans()
+  },
+  methods: {
+    async getFans () {
+      const { data: { data } } = await this.$ajax('followers')
+      this.fans = data.results
+      console.log(this.fans)
     }
   }
 }
